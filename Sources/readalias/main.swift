@@ -1,15 +1,10 @@
 import Foundation
+import config
 
 // Copyright 2026 Erik Heckman <erik@heckman.ca>
 // SPDX-License-Identifier: MIT
 //
 // readalias
-
-#if VERSION
-    let version = "readalias v\(VERSION)"
-#else
-    let version = "readalias v0.0.1"  // Fallback for local dev
-#endif
 
 let usage = """
     Usage: readalias <alias-file>

@@ -1,15 +1,10 @@
 import Foundation
+import config
 
 // Copyright 2026 Erik Heckman <erik@heckman.ca>
 // SPDX-License-Identifier: MIT
 //
 // mkalias
-
-#if VERSION
-    let version = "mkalias v\(VERSION)"
-#else
-    let version = "mkalias v0.0.1"  // Fallback for local dev
-#endif
 
 let usage = """
     Usage: mkalias [-f|--force] <path-of-original> <alias-file>
