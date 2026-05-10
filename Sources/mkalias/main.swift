@@ -19,19 +19,17 @@ let help = """
     Create an alias file that points to the path of an original
     filesystem object.
 
-    Will not overwrite and existing file with <alias-file> unless
-    the `--force` (or `-f`) option is specified.
+    Will not overwrite and existing file with <alias-file>
+    unless the `--force` (or `-f`) option is specified.
+    Will never overwrite an existing directory.
 
-    On success, create the alias, print nothing, and exit with a
-    zero exit status.
+    On success, create the alias, print nothing,
+    and exit with a status of zero.
 
-    On failure, print an error message to stderr and exit
+    On failure, print an error message to stderr and terminate
     with a non-zero exit status: 2 if the file is not specified,
-
-    On failure, print an error message to stderr and exit
-    with a non-zero exit status: 2 if the file is not specified,
-    not found, or not an alias file; 1 if the alias cannot be
-    resolved; 71 on an unexpected file-system error.
+    not found, or not an alias file; 1 if the alias cannot
+    be resolved; 71 on an unexpected file-system error.
     """
 
 do {

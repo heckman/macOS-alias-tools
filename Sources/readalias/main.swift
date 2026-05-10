@@ -17,10 +17,11 @@ let usage = """
     """
 let help = """
     Print the path to the original file of an alias file.
-    On failure, print an error message to stderr and exit
-    with a non-zero exit status: 2 if the file is not specified,
-    not found, or not an alias file; 1 if the alias cannot be
-    resolved; 71 on an unexpected file-system error.
+
+    On failure, print an error message to stderr and exit with
+    a non-zero exit status: 2 if the file is not specified,
+    not found, or not an alias file; 1 if the alias cannot
+    be resolved; 71 on an unexpected file-system error.
     """
 
 do {
