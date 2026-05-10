@@ -6,7 +6,7 @@ cd ${0:h}
 print "Cleaning old build files..."
 rm -rf .build bin
 
-VERSION="${${APP_VERSION:-0.0.1}#v}"
+VERSION="${$(APP_VERSION:-$(git describe --tags --always --dirty --long || echo 0.0.1)}#v}"
 
 print "Building universal binaries for version: $VERSION"
 
