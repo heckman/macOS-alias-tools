@@ -8,7 +8,7 @@ import config
 
 let usage = """
     Usage: readalias <alias-file>
-           readalias -h|--help
+           readalias -h|-v|--help|--version
     """
 let help = """
     Print the path to the original file of an alias file.
