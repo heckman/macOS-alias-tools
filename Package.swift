@@ -3,7 +3,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "alias-utils",
+    name: "macOS-alias-utils",
     targets: [
         .target(
             name: "config",
