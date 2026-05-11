@@ -3,7 +3,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "aliastools",
+    name: "alias-utils",
     targets: [
         .target(
             name: "config",
