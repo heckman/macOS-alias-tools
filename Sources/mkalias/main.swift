@@ -35,7 +35,7 @@ do {
     optionLoop: while !args.isEmpty && args[0].hasPrefix("-") {
         switch args[0] {
         case "-v", "--version":
-            print("\(version)\n")
+            print("mkalias \(about)")
             exit(0)
         case "-h", "--help":
             print("\n\(usage)\n\n\(help)\n")

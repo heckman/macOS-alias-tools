@@ -23,7 +23,7 @@ do {
     let args = CommandLine.arguments
     if args.count > 1 {
         if args[1] == "--version" || args[1] == "-v" {
-            print("\(version)\n")
+            print("readalias  \(about)")
             exit(0)
         } else if args[1] == "--help" || args[1] == "-h" {
             print("\n\(usage)\n\n\(help)\n")

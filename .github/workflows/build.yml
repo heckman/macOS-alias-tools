@@ -1,4 +1,4 @@
-name: Build and Release aliastools
+name: Build and Release macOS-alias-utils
 
 on:
   push:
@@ -6,61 +6,31 @@ on:
   workflow_dispatch:
 
 jobs:
-  # compile binaries on every push (or manual trigger)
-  build:
-    name: Build macOS Binaries
+  build-and-release:
+    name: Build and Release
     runs-on: macos-latest
+    permissions:
+      contents: write
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v6
 
-      - name: Build
+      - name: Build Binaries
         run: chmod +x build && ./build
         env:
           APP_VERSION: ${{ github.ref_name }}
 
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: compiled-binaries # name used in next job
-          path: |
-            .build/apple/Products/Release/readalias
-            .build/apple/Products/Release/mkalias
-
-  # genererate a release for every tag
-  release:
-    name: Create GitHub Release
-    if: startsWith(github.ref, 'refs/tags/')
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4 # Needed to grab README.md and LICENSE
-
-      - name: Download Binaries
-        uses: actions/download-artifact@v4
-        with:
-          name: compiled-binaries
-          path: ./binaries
-
-      - name: Zip for Release
-        # -j will junk directories, creating a flat archive
+      - name: Package ZIP
         run: |
-          zip -j aliastools-${{ github.ref_name }}-universal.zip \
-          ./binaries/readalias \
-          ./binaries/mkalias \
+          zip -j macOS-alias-utils.${{ github.ref_name }}.zip \
+          bin/readalias \
+          bin/mkalias \
           README.md \
           LICENSE
 
-      - name: Generate Checksum
-        run: shasum -a 256 aliastools-${{ github.ref_name }}-universal.zip > aliastools-${{ github.ref_name }}-universal.zip.sha256
-
-      - name: Upload to GitHub Release
-        uses: softprops/action-gh-release@v2
+      - name: Publish Release
+        uses: softprops/action-gh-release@v3
+        if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: |
-            aliastools-${{ github.ref_name }}-universal.zip
-            aliastools-${{ github.ref_name }}-universal.zip.sha256
+          files: macOS-alias-utils.${{ github.ref_name }}.zip
           generate_release_notes: true
