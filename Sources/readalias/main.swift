@@ -1,26 +1,22 @@
 import Foundation
+import config
 
 // Copyright 2026 Erik Heckman <erik@heckman.ca>
 // SPDX-License-Identifier: MIT
 //
 // readalias
 
-#if VERSION
-    let version = "readalias v\(VERSION)"
-#else
-    let version = "readalias v0.0.1"  // Fallback for local dev
-#endif
-
 let usage = """
     Usage: readalias <alias-file>
-           readalias -h|--help
+           readalias -h|-v|--help|--version
     """
 let help = """
     Print the path to the original file of an alias file.
-    On failure, print an error message to stderr and exit
-    with a non-zero exit status: 2 if the file is not specified,
-    not found, or not an alias file; 1 if the alias cannot be
-    resolved; 71 on an unexpected file-system error.
+
+    On failure, print an error message to stderr and exit with
+    a non-zero exit status: 2 if the file is not specified,
+    not found, or not an alias file; 1 if the alias cannot
+    be resolved; 71 on an unexpected file-system error.
     """
 
 do {

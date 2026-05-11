@@ -5,12 +5,18 @@ import PackageDescription
 let package = Package(
     name: "aliastools",
     targets: [
+        .target(
+            name: "config",
+            path: "Sources/config"
+        ),
         .executableTarget(
             name: "readalias",
+            dependencies: ["config"],
             path: "Sources/readalias"
         ),
         .executableTarget(
             name: "mkalias",
+            dependencies: ["config"],
             path: "Sources/mkalias"
         ),
     ],
