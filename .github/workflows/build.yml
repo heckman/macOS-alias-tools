@@ -22,9 +22,9 @@ jobs:
 
       - name: Package ZIP
         run: |
-          zip -j macOS-alias-utils.${{ github.ref_name }}.zip \
-          bin/readalias \
-          bin/mkalias \
+          zip macOS-alias-utils.${{ github.ref_name }}.zip \
+          bin/* \
+          scripts/* \
           README.md \
           LICENSE
 
