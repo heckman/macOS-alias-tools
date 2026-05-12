@@ -1,0 +1,32 @@
+#!/bin/zsh
+# Part of macOS-alias-utils <https://github.com/heckman/macOS-alias-utils>
+# Copyright (c) 2026 Erik Ben Heckman
+# MIT License
+
+#: makealias [options] <original> [<alias-file>]
+
+# All arguments (and options) are passed to the `mkalias` command,
+# along with one additional argument: an alias name derived
+# from the last argument. This means that, unlike the `mkalias`
+# command, <alias-file> is optional. I <alias-file> is specified,
+# this script will still produce an additional argument, but
+# it will be ignored by the `mkalias` command.
+#
+# This script relies on the fact that the `mkalias` command
+# will silently ignore extra arguments.
+#;
+
+if (( $+commands[mkalias] ))
+then
+makealias() {
+	mkalias $@ "$(namealias ${@[-1]})"
+}
+else
+makealias(){
+	print -u2 'Error: the `makealias` function requires the `mkalias` command'
+	print -u2 'Get it here: <https://github.com/heckman/macOS-alias-utils>'
+	return 69 # EX_UNAVAILABLE
+}
+fi
+
+makealias $@

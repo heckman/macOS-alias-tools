@@ -1,0 +1,36 @@
+#!/bin/zsh
+# Part of macOS-alias-utils <https://github.com/heckman/macOS-alias-utils>
+# Copyright (c) 2026 Erik Ben Heckman
+# MIT License
+
+#: isalias <alias-file>
+
+# Return 0 if <alias-file> is an alias file,
+# even if it cannot be resolved.
+# Otherwise, return 1.
+#
+# Produces no output.
+#
+# This relies on the exit status of `readalias <alias-file>`:
+#   0: <alias-file> is an alias file and can be resolved.
+#   1: <alias-file> is an alias file but cannot be resolved.
+#   2: <alias-file> is not an alias file, does not exist,
+#      or was not specified.
+#
+# Requires: [readalias](https://github.com/heckman/macOS-alias-utils).
+#;
+
+if (( $+commands[readalias] ))
+then
+isalias() {
+	readalias $@ &>/dev/null || ((?==1))
+}
+else
+isalias(){
+	print -u2 'Error: the `isalias` function requires the `readalias` command'
+	print -u2 'Get it here: <https://github.com/heckman/macOS-alias-utils>'
+	return 69 # EX_UNAVAILABLE
+}
+fi
+
+isalias $@

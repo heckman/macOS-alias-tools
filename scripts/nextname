@@ -1,0 +1,38 @@
+#!/bin/zsh
+# Part of macOS-alias-utils <https://github.com/heckman/macOS-alias-utils>
+# Copyright (c) 2026 Erik Ben Heckman
+# MIT License
+
+#: nextname <desired-name>
+
+# If <desired-name> does not exist, print it.
+# Otherwise append 2 to the name, and check again.
+# Increment the number until an available name is found.
+#;
+
+nextname() {
+	# nothing to do if the name is available
+	[[ -e $1 ]] || {
+		print -- $1
+		return
+	}
+
+	# This limits the number of alternate names that will be checked.
+	# The loop is quite fast--file existence is not checked within it.
+	local loop_limit=99999
+
+	# populate an set of potentially-conflicting names
+	local base="$1 "
+	local -A extant=()
+	local f
+	for f ( $base*(N) ) extant[$f]=1
+	local counter=1
+
+	# increment counter until the name is not in the set
+	while (( ${+extant[$base$((++counter))]} )) {
+		(( counter > loop_limit )) && return 1
+	}
+	print -- $base$counter
+}
+
+nextname $@
