@@ -1,6 +1,6 @@
 #!/bin/zsh
-# Part of macOS-alias-utils <https://github.com/heckman/macOS-alias-utils>
-# Copyright (c) 2026 Erik Ben Heckman
+# https://github.com/heckman/macOS-alias-utils
+# Copyright 2026 Erik Ben Heckman
 # MIT License
 
 #: isalias <alias-file>
