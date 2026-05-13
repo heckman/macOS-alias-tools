@@ -1,0 +1,30 @@
+#!/bin/zsh
+# Part of macOS-alias-utils <https://github.com/heckman/macOS-alias-utils>
+# Copyright (c) 2026 Erik Ben Heckman
+# MIT License
+
+#: namealias <original>
+
+if (( $+commands[readalias] ))
+then
+namealias() {
+	local ideal f
+	# If original is an alias, use _its_ original
+	# otherwise, use the original.
+	# Then strip the directory from the name.
+	ideal="${"$(readalias $1 2>/dev/null || echo $1)":t}"
+
+	if [[ -e $ideal ]]
+	then nextname "$ideal alias"
+	else print -- $ideal
+	fi
+}
+else
+namealias(){
+	print -u2 'Error: the `namealias` function requires the `readalias` command'
+	print -u2 'Get it here: <https://github.com/heckman/macOS-alias-utils>'
+	return 69 # EX_UNAVAILABLE
+}
+fi
+
+namealias $@

@@ -54,7 +54,7 @@ do {
             exit(2)
         }
     }
-    guard args.count == 2 else {
+    guard args.count >= 2 else {
         fputs(
             "\(usage)\n",
             stderr
