@@ -71,6 +71,12 @@ These scripts make use of the `readalias` and `mkalias` binaries.
 The funcionality provided by these scripts
 may eventually be merged into the binaries,
 or be made into new binaries themselves.
+The format of these scripts is such that
+the files can be used as autoloadable functions in Zsh
+by simply placeing them in a directory on the `fpath`.
+This is how I use them, which is why each script
+is a single function called from its body, and why
+the two helper functions have their own scripts.
 
 ### isalias
 
@@ -88,6 +94,7 @@ in which case a suitable name will be generated.
 
 ### namealias
 
+This is a helper used by `makealias`.
 Given a path, this will print a name
 suitable to be used for an alias file,
 using the the same naming strategy used by the Finder.
