@@ -70,6 +70,7 @@ main(){
 		watch) watch_latest ;;
 		release)
 			tag_main ${@:2} || return 1
+			sleep 0.7 # give github action time to start
 			watch_latest
 			;;
 		save) apply_dev_to_grit ;;
@@ -104,8 +105,7 @@ tag_main(){
 	local patches
 	patches="$(
 		git tag --sort=-v:refname -n --list "v[0-9]*" |
-		awk -F. 'NR=1{major=$1;minor=$2}$1==major&&$2==minor{print;next}{exit}' |
-		tac
+		awk -F. 'NR=1{major=$1;minor=$2}$1==major&&$2==minor{print;next}{exit}'
 	)"
 	local next_patch
 	next_patch="$(
@@ -124,7 +124,7 @@ tag_main(){
 	fi
 	version=v${version#v}
 	autoload -Uz is-at-least
-	is-at-least $next_patch $version || {
+	is-at-least ${next_patch#v} ${version#v} || {
 		print -u2 "❌ Aborting: version must be at least $next_patch"
 		return 2
 	}
