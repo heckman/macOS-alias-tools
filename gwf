@@ -1,0 +1,179 @@
+#!/bin/zsh
+set -e
+
+# gwf -- git workflow
+#
+# Very much a WORK IN PROGRESS
+# for my main/dev/grit branches workflow
+
+usage='
+Usage: gwf [pr|release|reset|save|sync|delete|watch]
+
+Work is done on `dev`, which is a short-lived branch off of `main`.
+The `main` branch is only modified through pull requests from `dev`.
+The commits from `dev` are cherry-picked onto `grit`, and then
+`dev` is deleted, and recreated as a new branch off of `main`.
+
+When ready to add the changes to `main` (and create a new release)
+I run this script once for each of these primary steps:
+
+  pr       Push dev, then open the github repo in a browser.
+           This does not create a pull request automatically.
+	   The intent is to make the pull request in the browser,
+           as well as squash-merge it into main.
+  release  Tag the main branch, triggering a release,
+           then watch the latest github action
+  reset    This performs the sub-steps: save, sync, and
+           then delete; aborting if any step fails.
+
+These sub-steps can also be run independently:
+
+  save     Save commits on dev branch to the grit branch.
+  sync     Sync-up the grit branch with the main branch.
+  delete   Delete the dev branch, then recreate it
+	   as a new branch off of the main branch.
+
+  watch    Watch the latest github action.
+           This step is automaically run by the release step,
+           but it can also be used at any time by itself.
+
+'
+
+main(){
+	[ -z "$(git status --porcelain)" ] || {
+		print -u2 '❌ Repo must be in a clean state. It is not:'
+		git status
+		return 1
+	}
+	local starting_branch
+	starting_branch=$(git branch --show-current 2>/dev/null) || return 1
+
+	# ensure the script ends in the same branch it started in, if possible
+	TRAPEXIT() {
+		local exit_status=$?
+		[[ -z "$starting_branch" ]] && return $exit_status
+		git show-ref --verify --quiet "refs/heads/$starting_branch" && {
+			git checkout "$starting_branch" &>/dev/null
+			return $exit_status
+		}
+		print -u2 "\n⚠️  Starting branch '$starting_branch' no longer exists. Switching to main."
+		git checkout main &>/dev/null ||
+			print -u2 "❌ Failed to switch to main. Check git status."
+		return $exit_status
+	}
+
+	case ${1-} {
+		pr)
+			git push origin dev || return 1
+			gh browse
+			;;
+		watch) watch_latest ;;
+		release)
+			tag_main ${@:2} || return 1
+			watch_latest
+			;;
+		save) apply_dev_to_grit ;;
+		sync) sync_grit_with_main ;;
+		delete) delete_dev ;;
+		reset)
+			apply_dev_to_grit &&
+			sync_grit_with_main &&
+			delete_dev
+			;;
+		*)
+			print -u2 $usage
+			return 2
+			;;
+	}
+}
+
+# On github: - make pull request from dev
+#            - squash-merge it into main
+watch_latest(){
+	local latest_run
+	latest_run="$(
+		gh run list -L 1 --json databaseId -q '.[0].databaseId'
+	)" && [[ -n $latest_run ]] || {
+		print -u2 "❌ No GitHub actions found."
+		return 1
+	}
+	gh run watch $latest_run
+}
+
+tag_main(){
+	local patches
+	patches="$(
+		git tag --sort=-v:refname -n --list "v[0-9]*" |
+		awk -F. 'NR=1{major=$1;minor=$2}$1==major&&$2==minor{print;next}{exit}' |
+		tac
+	)"
+	local next_patch
+	next_patch="$(
+		<<<$patches awk -F'[.[:space:]]' '
+			{printf("%s.%d.%d",$1,$2,$3+1); exit}
+		'
+	)"
+	local version
+	if [[ -n $1 ]]
+		then version=$1
+	else
+		print 'Patches for this minor version:'
+		tac <<< $patches
+		version=$next_patch
+		vared -p "Enter version number: " version
+	fi
+	version=v${version#v}
+	autoload -Uz is-at-least
+	is-at-least $next_patch $version || {
+		print -u2 "❌ Aborting: version must be at least $next_patch"
+		return 2
+	}
+	# get the latest main, but don't do any merging within the script
+	git checkout main && git pull --ff-only origin main || return 1
+	git tag $version &&
+	git push origin main --tags
+}
+
+
+apply_dev_to_grit(){
+	# ensure we have the lastest version of the two branches
+	# but don't do any merging within the script, just bail instead
+	git checkout dev && git pull --ff-only origin dev || return 1
+	git checkout grit && git pull --ff-only origin grit || return 1
+
+	local fork_point="$(git merge-base main dev)"  || return 1
+
+	print "🍒 Cherry-picking new commits from dev onto grit..."
+	git cherry-pick "${fork_point}..dev" || {
+		print -u2 '❌ Cherry-pick conflict detected!'
+		print -u2 'Fix the conflicting files, run "git add .", and type "git cherry-pick --continue"'
+		return 1
+	}
+	git push origin grit
+}
+
+sync_grit_with_main(){
+	# ensure we have the lastest version of the two branches,
+	# but don't do any merging within the script, just bail instead
+	git checkout main && git pull --ff-only origin main || return 1
+	git checkout grit && git pull --ff-only origin grit || return 1
+	git merge main -s ours -m "Sync with 'main'" &&
+	git push origin grit
+}
+
+# Delete the dev branch and create a new one from main
+delete_dev(){
+	print -n "Sure you want to ERASE the dev branch? [y/N] "
+	read -q  || {
+		print -u2 'Aborting.'
+		return 1
+	}
+	print ""
+	git checkout main &&
+	git branch -D dev &&
+	git push origin --delete dev &&
+	git checkout -b dev &&
+	git push -u origin dev
+}
+
+main $@
