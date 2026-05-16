@@ -65,18 +65,16 @@ Never writes to stdout.
 On error, an message is printed to stderr,
 and the exit status is non-zero.
 
-## Scripts
+## Functions
 
-These scripts make use of the `readalias` and `mkalias` binaries.
-The funcionality provided by these scripts
-may eventually be merged into the binaries,
-or be made into new binaries themselves.
-The format of these scripts is such that
-the files can be used as autoloadable functions in Zsh
-by simply placeing them in a directory on the `fpath`.
-This is how I use them, which is why each script
-is a single function called from its body, and why
-the two helper functions have their own scripts.
+These Zsh funtions make use of the `readalias` and `mkalias` binaries.
+I put them on my `fpath`, and autoload them.
+I've made the files executable with a _zsh_ shebang,
+so they can also be run as scripts from any shell.
+
+The features provided by these functions
+may eventually be incorporated into the binaries.
+
 
 ### isalias
 
